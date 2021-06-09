@@ -1,0 +1,3 @@
+-Q coq Graph
+-R coq Graph
+-R lib/InteractionTrees/theories ITree
