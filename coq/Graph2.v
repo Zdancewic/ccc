@@ -467,3 +467,62 @@ Section CartesianClosed.
 Instance Curry_Fun : Curry Fun prod Fun :=
   fun {A B C} f => fun c a => f (c, a).
 *)
+
+  Program Instance Curry_DGPH : Curry DGPH PROD EXP :=
+    fun A B C (m : graph_morphism (C ⊗ A) B) =>
+      map C (EXP A B)
+          (curry_ (vert_map m))
+          (fun (ec : edge C) =>
+             (map (I ⊗ A) B
+                  (@bimap _ Fun prod _ _ _ _ _ (fun i => match i with ss_I => src C ec | tt_I => tgt C ec end) (id_ (vert A)) >>> (vert_map m))
+                  (@bimap _ Fun prod _ _ _ _ _ (const ec) (id_ (edge A)) >>> (edge_map m))
+                  _ _)
+          )
+          _ _.
+  Next Obligation.
+    rewrite <- cat_assoc.
+    rewrite bimap_cat.
+    rewrite const_f.
+    destruct m. cbn.
+    rewrite cat_assoc.
+    rewrite src_map0.
+    rewrite cat_id_r. reflexivity.
+  Qed.
+  Next Obligation.
+    rewrite <- cat_assoc.
+    rewrite bimap_cat.
+    rewrite const_f.
+    destruct m. cbn.
+    rewrite cat_assoc.
+    rewrite tgt_map0.
+    rewrite cat_id_r. reflexivity.
+  Qed.
+  Next Obligation.
+    intro. cbn.
+    unfold const, id_, Id_Fun, cat, Cat_Fun. 
+    destruct m.  cbn.
+    unfold curry_, Curry_Fun.
+    apply functional_extensionality.
+    reflexivity.
+  Qed.
+  Next Obligation.
+    intro. cbn.
+    unfold const, id_, Id_Fun, cat, Cat_Fun. 
+    destruct m.  cbn.
+    unfold curry_, Curry_Fun.
+    apply functional_extensionality.
+    reflexivity.
+  Qed.
+
+  Program Instance CurryApply_DGPH : CurryApply DGPH PROD EXP.
+  Next Obligation.
+    unfold curry_, Curry_DGPH, apply_, Apply_DGPH.
+    unfold eq2, eq2_graph_morphism.
+    split.
+    - cbn. rewrite <- bimap_pair_unfold. rewrite <- curry_apply. reflexivity. typeclasses eauto.
+    - cbn. rewrite <- bimap_pair_unfold. rewrite <- cat_assoc. rewrite bimap_cat.
+      repeat rewrite <- cat_assoc. destruct f. cbn.
+      rewrite cat_id_l. intro. destruct a0. reflexivity. 
+ Qed.
+    
+End CartesianClosed.
