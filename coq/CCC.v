@@ -1,0 +1,99 @@
+From ITree Require Import
+     Basics.Category
+     CategoryOps
+     CategoryFunctor.
+
+Import Carrier.
+
+From CCC Require Import
+     STLC.
+
+Import CatNotations.
+Local Open Scope cat_scope.
+
+Module Denotation(BT : Base).
+
+  Module L := STLC(BT).
+  Import L.
+  Import BT.
+       
+  Section Denote.
+
+  Context {obj : Type} (C : Hom obj).
+  Context {Eq2_C : Eq2 C} {Id_C : Id_ C} {Cat_C : Cat C}.
+  Context (ONE : obj)
+          {Term_C : Terminal C ONE}.
+  Context (PROD : binop obj).
+  Context {Pair_C : Pair C PROD}
+          {Fst_C : Fst C PROD}
+          {Snd_C : Snd C PROD}.
+  Context (ZERO : obj)
+          {Initial_C : Initial C ZERO}.
+  Context (SUM : binop obj).
+  Context {Case_C : Case C SUM}
+          {Inl_C : Inl C SUM}
+          {Inr_C : Inr C SUM}.
+  Context (EXP : binop obj).
+  Context {Apply_C : Apply C PROD EXP}
+          {Curry_C : Curry C PROD EXP}.
+  
+  Existing Instance Bimap_Product.
+  Existing Instance Swap_Product.
+
+  Context {CCC : CartesianClosed C ONE PROD EXP}.
+
+  Context {denote_B : B -> obj}.
+  Context {denote_Const : forall (c:BT.Const), C ONE (denote_B (base_type c))}.
+
+  Fixpoint denote_typ (t:typ) : obj :=
+    match t with
+    | Base b => denote_B b
+    | Zero => ZERO
+    | Plus t1 t2 => SUM (denote_typ t1) (denote_typ t2)
+    | One => ONE
+    | Prod t1 t2 => PROD (denote_typ t1) (denote_typ t2)
+    | Arr t1 t2  => EXP (denote_typ t1) (denote_typ t2)
+    end.
+
+  Fixpoint denote_ctx (G:ctx) : obj :=
+    match G with
+    | nil => ONE
+    | t::G => PROD (denote_typ t) (denote_ctx G)
+    end.
+
+  Program Definition denote_var {G:ctx} {t:typ} (v : var G t) : C (denote_ctx G) (denote_typ t).
+  induction v.
+  - cbn. exact fst_.
+  - eapply cat. exact snd_. apply IHv.
+  Defined. 
+
+  (* Program Definition distribute {a b c d} :  *)
+  (*    C a (PROD (SUM b c) d) -> C a (SUM (PROD b d) (PROD c d)).  *)
+
+ (* (f : a -> (b + c) * d ) =>
+     fun (x:a) =>
+       let (y, z) = f a in
+       case y of
+       | inl w => inl (w, z)
+       | inr w => inr (w ,z) *)
+  
+  Program Definition denote_tm {G:ctx} {t:typ} (e : tm G t) : C (denote_ctx G) (denote_typ t).
+  induction e.
+  - eapply cat. exact one. exact (denote_Const c).
+  - exact (denote_var v).
+  - eapply cat. exact IHe. exact empty.
+  - eapply cat. exact IHe. exact inl_.
+  - eapply cat. exact IHe. exact inr_.
+  - cbn in *.
+    exact ((pair_ (IHe1 >>> case_ (curry_ IHe2) (curry_ IHe3))) (id_ _) >>> apply_).
+  - exact one.
+  - eapply cat. exact IHe. exact fst_.
+  - eapply cat. exact IHe. exact snd_.
+  - exact (pair_ IHe1 IHe2).
+  - cbn in *.
+    exact (curry_ (@swap _ _ PROD _ _ _ >>> IHe)).
+  - exact (pair_ IHe1 IHe2 >>> apply_).
+  Defined.    
+  
+  End Denote.
+End Denotation.  

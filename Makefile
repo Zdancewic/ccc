@@ -8,14 +8,14 @@ EXTRACTDIR = ml/extracted
 
 ITREEDIR=lib/InteractionTrees
 
-COQINCLUDES=$(foreach d, $(COQDIR), -R $(d) Graph) -R $(ITREEDIR)/theories/ ITree # -R $(EXTRACTDIR) Extract
+COQINCLUDES=$(foreach d, $(COQDIR), -R $(d) CCC) -R $(ITREEDIR)/theories/ ITree # -R $(EXTRACTDIR) Extract
 COQC="$(COQBIN)coqc" -q $(COQINCLUDES) $(COQCOPTS)
 COQDEP="$(COQBIN)coqdep" $(COQINCLUDES)
 COQEXEC="$(COQBIN)coqtop" -q -w none $(COQINCLUDES) -batch -load-vernac-source
 MENHIR=menhir
 CP=cp
 
-COQFILESINTERP := Graph
+COQFILESINTERP := Graph2 STLC CCC
 
 COQFILESOPT    := 
 

@@ -39,18 +39,18 @@ Module STLC (BT: Base).
   | Var  : forall G t, var G t -> tm G t
   | Err  : forall (G:ctx) (t:typ),
       tm G Zero -> tm G t
-  | Inl : forall G (t1 t2:typ),
+  | Inl_tm : forall G (t1 t2:typ),
       tm G t1 -> tm G (Plus t1 t2)
-  | Inr : forall G (t1 t2:typ),
+  | Inr_tm : forall G (t1 t2:typ),
       tm G t2 -> tm G (Plus t1 t2)
-  | Case : forall G (t1 t2 t:typ),
+  | Case_tm : forall G (t1 t2 t:typ),
       tm G (Plus t1 t2) -> tm (t1::G) t -> tm (t2::G) t -> tm G t
   | Unit : forall G, tm G One
-  | Fst : forall G (t1 t2:typ),
+  | Fst_tm : forall G (t1 t2:typ),
       tm G (Prod t1 t2) -> tm G t1
-  | Snd : forall G (t1 t2:typ),
+  | Snd_tm : forall G (t1 t2:typ),
       tm G (Prod t1 t2) -> tm G t2
-  | Pair : forall G (t1 t2:typ),
+  | Tuple : forall G (t1 t2:typ),
       tm G t1 -> tm G t2 -> tm G (Prod t1 t2)
   | Abs : forall G (t1 t2:typ),
       tm (t1::G) t2 -> tm G (Arr t1 t2)
@@ -85,6 +85,8 @@ Module STLC (BT: Base).
     * apply VarS. apply VarS. assumption.
   Defined.
 
+  Print weaken_var_r.
+  
   Program Definition exchange_var_r : forall G1 G2 (u1 u2 t:typ),
       var ([u1] ++ G1 ++ [u2] ++ G2) t ->
       var ([u2] ++ G1 ++ [u1] ++ G2) t.                                           
@@ -119,24 +121,25 @@ Module STLC (BT: Base).
   - apply Const.
   - apply Var. apply exchange_var. subst. assumption.
   - apply Err. apply IHtm; assumption.
-  - eapply Inl; eauto.
-  - eapply Inr; eauto.
-  - eapply Case with (t1:=t1) (t2:=t2).
+  - eapply Inl_tm; eauto.
+  - eapply Inr_tm; eauto.
+  - eapply Case_tm with (t1:=t1) (t2:=t2).
     + apply IHtm1. assumption.
     + replace (t1 :: G1 ++ [u2] ++ G2 ++ [u1] ++ G3) with ((t1 :: G1) ++ [u2] ++ G2 ++ [u1] ++ G3) by reflexivity.
       apply IHtm2. subst. reflexivity.
     + replace (t2 :: G1 ++ [u2] ++ G2 ++ [u1] ++ G3) with ((t2 :: G1) ++ [u2] ++ G2 ++ [u1] ++ G3) by reflexivity.
       apply IHtm3. subst. reflexivity.
   - apply Unit; eauto.
-  - eapply Fst; eauto.
-  - eapply Snd; eauto.
-  - eapply Pair; eauto.
+  - eapply Fst_tm; eauto.
+  - eapply Snd_tm; eauto.
+  - eapply Tuple; eauto.
   - eapply Abs.
     replace (t1 :: G1 ++ [u2] ++ G2 ++ [u1] ++ G3) with ((t1 :: G1) ++ [u2] ++ G2 ++ [u1] ++ G3) by reflexivity.
     apply IHtm. subst; reflexivity.
   - eapply App; eauto.
   Defined.
 
+  
   Program Definition promote_var : forall G1 G2 u t,
       var (G1 ++ [u] ++ G2) t ->
       var ([u] ++ G1 ++ G2) t.
@@ -158,9 +161,9 @@ Module STLC (BT: Base).
   - apply Const.
   - apply Var. apply promote_var. subst. assumption.
   - apply Err. apply IHtm; assumption.
-  - eapply Inl; eauto.
-  - eapply Inr; eauto.
-  - eapply Case with (t1:=t1) (t2:=t2).
+  - eapply Inl_tm; eauto.
+  - eapply Inr_tm; eauto.
+  - eapply Case_tm with (t1:=t1) (t2:=t2).
     + apply IHtm1. assumption.
     + subst.
       specialize (IHtm2 (t1 :: G1) G2 u eq_refl). 
@@ -173,9 +176,9 @@ Module STLC (BT: Base).
       apply exchange_tm.
       apply IHtm3.
   - apply Unit.
-  - eapply Fst. eauto.
-  - eapply Snd. eauto.
-  - eapply Pair; eauto.
+  - eapply Fst_tm. eauto.
+  - eapply Snd_tm. eauto.
+  - eapply Tuple; eauto.
   - eapply Abs.
     replace (t1 :: [u] ++ G1 ++ G2) with ([] ++ [t1] ++ [] ++ [u] ++ G1 ++ G2) by reflexivity.
     apply exchange_tm.
@@ -192,16 +195,16 @@ Module STLC (BT: Base).
   - apply Const.
   - apply Var. apply weaken_var_l. assumption.
   - apply Err. auto.
-  - eapply Inl; eauto.
-  - eapply Inr; eauto.
-  - eapply Case with (t1:=t1) (t2:=t2).
+  - eapply Inl_tm; eauto.
+  - eapply Inr_tm; eauto.
+  - eapply Case_tm with (t1:=t1) (t2:=t2).
     + apply IHtm1. 
     + apply promote_tm. apply IHtm2.
     + apply promote_tm. apply IHtm3.
   - apply Unit; eauto.
-  - eapply Fst; eauto.
-  - eapply Snd; eauto.
-  - eapply Pair; eauto.
+  - eapply Fst_tm; eauto.
+  - eapply Snd_tm; eauto.
+  - eapply Tuple; eauto.
   - eapply Abs.
     apply promote_tm. auto.
   - eapply App; eauto.
@@ -214,13 +217,13 @@ Module STLC (BT: Base).
   - apply Const.
   - apply Var. apply weaken_var_r. assumption.
   - apply Err. auto.
-  - eapply Inl; eauto.
-  - eapply Inr; eauto.
-  - eapply Case with (t1:=t1) (t2:=t2); eauto.
+  - eapply Inl_tm; eauto.
+  - eapply Inr_tm; eauto.
+  - eapply Case_tm with (t1:=t1) (t2:=t2); eauto.
   - apply Unit; eauto.
-  - eapply Fst; eauto.
-  - eapply Snd; eauto.
-  - eapply Pair; eauto.
+  - eapply Fst_tm; eauto.
+  - eapply Snd_tm; eauto.
+  - eapply Tuple; eauto.
   - eapply Abs. cbn in IHtm. auto.
   - eapply App; eauto.
  Defined.
@@ -255,15 +258,15 @@ Module STLC (BT: Base).
   - apply Const.
   - subst. apply Var. apply weaken_var_mid. assumption.
   - apply Err; eauto.
-  - eapply Inl; eauto.
-  - eapply Inr; eauto.
-  - eapply Case with (t1:=t1) (t2:=t2); eauto.
+  - eapply Inl_tm; eauto.
+  - eapply Inr_tm; eauto.
+  - eapply Case_tm with (t1:=t1) (t2:=t2); eauto.
     + subst. specialize (IHtm2 (t1::G1) G2 G3 eq_refl). apply IHtm2.
     + subst. specialize (IHtm3 (t2::G1) G2 G3 eq_refl). apply IHtm3.      
   - apply Unit; eauto.
-  - eapply Fst; eauto.
-  - eapply Snd; eauto.
-  - eapply Pair; eauto.
+  - eapply Fst_tm; eauto.
+  - eapply Snd_tm; eauto.
+  - eapply Tuple; eauto.
   - eapply Abs.
     subst.
     specialize (IHtm (t1::G1) G2 G3 eq_refl). apply IHtm.
@@ -295,18 +298,18 @@ Module STLC (BT: Base).
   - apply Const.
   - eapply subst_var. apply H. subst. assumption.
   - eapply Err. eauto.
-  - eapply Inl; eauto.
-  - eapply Inr; eauto.
-  - eapply Case.
+  - eapply Inl_tm; eauto.
+  - eapply Inr_tm; eauto.
+  - eapply Case_tm.
     + eapply IHtm1; eauto.
     + replace (t1 :: G1 ++ G2) with ((t1 :: G1) ++ G2) by reflexivity. 
       eapply IHtm2; eauto. subst. reflexivity.
     + replace (t2 :: G1 ++ G2) with ((t2 :: G1) ++ G2) by reflexivity. 
       eapply IHtm3; eauto. subst. reflexivity.
   - eapply Unit.
-  - eapply Fst; eauto.
-  - eapply Snd; eauto.    
-  - eapply Pair; eauto.
+  - eapply Fst_tm; eauto.
+  - eapply Snd_tm; eauto.    
+  - eapply Tuple; eauto.
   - eapply Abs.
     replace (t1 :: G1 ++ G2) with ((t1 :: G1) ++ G2) by reflexivity.
     eapply IHtm. apply H.

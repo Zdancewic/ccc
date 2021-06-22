@@ -524,5 +524,39 @@ Instance Curry_Fun : Curry Fun prod Fun :=
       repeat rewrite <- cat_assoc. destruct f. cbn.
       rewrite cat_id_l. intro. destruct a0. reflexivity. 
  Qed.
-    
+
+  (* Unfortunately, the definition of eq2 for the Fun category doesn't
+     allow any non-trivial equivalences on the underlying sets, so 
+     we can't prove properness.  We could reformuate the graph definitions
+     in terms of Typ instead of Fun, but that seems like a big hassle,
+     so I just axiomatized the idea that extensional equality of the
+     two component maps of a graph morphism implies equality.
+  *) 
+  Axiom graph_morphism_equality :
+    forall (A B : graph)
+      (vert_map0 vert_map1 : Fun (vert A) (vert B))
+      (edge_map0 edge_map1 : Fun (edge A) (edge B))
+      (src_map0 : edge_map0 >>> (src B) ⩯ (src A) >>> vert_map0)
+      (src_map1 : edge_map1 >>> (src B) ⩯ (src A) >>> vert_map1)
+      (tgt_map0 : edge_map0 >>> (tgt B) ⩯ (tgt A) >>> vert_map0)
+      (tgt_map1 : edge_map1 >>> (tgt B) ⩯ (tgt A) >>> vert_map1)
+      (H1: vert_map0 ⩯ vert_map1)
+      (H2: edge_map0 ⩯ edge_map1),
+      map A B vert_map0 edge_map0 src_map0 tgt_map0 =
+      map A B vert_map1 edge_map1 src_map1 tgt_map1.       
+      
+  Program Global Instance CartesianCloased_DGPH : CartesianClosed DGPH ONE PROD EXP.
+  Next Obligation.
+    repeat red. intros.
+    split.
+    - destruct x, y. cbn in *. inversion H. cbn in *.
+      rewrite H0. reflexivity.
+    - inversion H.
+      intro.  cbn.
+      apply graph_morphism_equality.
+      rewrite H0. reflexivity.
+      rewrite H1. reflexivity.
+  Qed.
+      
+      
 End CartesianClosed.
