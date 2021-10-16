@@ -422,11 +422,6 @@ Section CartesianClosed.
   
 
   (** ** Cartesian closure. *)
-  
-   (*
-     elt (EXP A B) = elt_EXP A B = (graph_morphism A B) + (graph_morphism (I ⊗ A) B)
-   *)
-
   Program Instance Apply_DGPH : Apply DGPH PROD EXP :=
     fun A B => map ((EXP A B) ⊗ A) B
                 apply_

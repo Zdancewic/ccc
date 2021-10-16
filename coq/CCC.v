@@ -1,7 +1,12 @@
+From Coq Require Import
+     List
+     Program.Equality
+     Classes.RelationClasses.
+
 From ITree Require Import
      Basics.Category
      CategoryOps
-     CategoryFunctor.
+     CategoryTheory.
 
 Import Carrier.
 
@@ -10,6 +15,9 @@ From CCC Require Import
 
 Import CatNotations.
 Local Open Scope cat_scope.
+
+Open Scope list_scope.
+Import ListNotations.
 
 Module Denotation(BT : Base).
 
@@ -36,6 +44,8 @@ Module Denotation(BT : Base).
   Context (EXP : binop obj).
   Context {Apply_C : Apply C PROD EXP}
           {Curry_C : Curry C PROD EXP}.
+
+  Context {Equivalence_Eq2 : forall a b, Equivalence (@eq2 obj C _ a b)}.
   
   Existing Instance Bimap_Product.
   Existing Instance Swap_Product.
@@ -94,6 +104,35 @@ Module Denotation(BT : Base).
     exact (curry_ (@swap _ _ PROD _ _ _ >>> IHe)).
   - exact (pair_ IHe1 IHe2 >>> apply_).
   Defined.    
+
+
+  (* One might like to prove something like this, but it basically requires proving 
+     termination of the step semantics. *)
+  Lemma step_soundness1 :
+    forall (t:typ) (e : tm [] t) ans
+      (H: step t e = ans),
+      (forall (e' : tm [] t), ans = inl e' ->  denote_tm e ⩯ denote_tm e') /\
+      (forall v, ans = inr v -> denote_tm e ⩯ denote_tm (tm_of_val _ v)).
+  Proof.
+    intros t e ans H.
+    dependent induction e; (split; [intros e' Hans | intros v' Hans]).
+    - cbn in H. rewrite Hans in H; inversion H.
+    - cbn in H. rewrite Hans in H; inversion H. subst. cbn. reflexivity.
+    - inversion v.
+    - inversion v.
+    - 
+
+      assert (([] : list typ) ~= ([] : list typ)).
+      { reflexivity. }
+      assert ((e : tm [] Zero) ~= (e : tm [] Zero)).
+      { reflexivity. }
+      assert (step Zero e = inl e).
+
+      specialize (IHe e H0 H1 (inl e)).
+      cbv in H. rewrite Hans in H. 
+  Admitted    
+      
+
   
   End Denote.
 End Denotation.  

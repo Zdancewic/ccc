@@ -15,7 +15,7 @@ COQEXEC="$(COQBIN)coqtop" -q -w none $(COQINCLUDES) -batch -load-vernac-source
 MENHIR=menhir
 CP=cp
 
-COQFILESINTERP := Graph2 STLC CCC
+COQFILESINTERP := Graph2 STLC CCC 
 
 COQFILESOPT    := 
 

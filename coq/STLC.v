@@ -85,8 +85,6 @@ Module STLC (BT: Base).
     * apply VarS. apply VarS. assumption.
   Defined.
 
-  Print weaken_var_r.
-  
   Program Definition exchange_var_r : forall G1 G2 (u1 u2 t:typ),
       var ([u1] ++ G1 ++ [u2] ++ G2) t ->
       var ([u2] ++ G1 ++ [u1] ++ G2) t.                                           
@@ -94,12 +92,13 @@ Module STLC (BT: Base).
   - apply swap_var. apply H.
   - replace ([u2] ++ (a::G1) ++ [u1] ++ G2) with ([u2] ++ [a] ++ G1 ++ [u1] ++ G2) by reflexivity.
     replace ([u1] ++ (a::G1) ++ [u2] ++ G2) with ([u1] ++ [a] ++ G1 ++ [u2] ++ G2) in H by reflexivity.
-    apply swap_var.
     apply swap_var in H.
     inversion H; subst.
-    + apply VarZ.
-    + apply VarS. apply IHG1. apply H3.
+    + apply swap_var. apply VarZ.
+    + apply swap_var. apply VarS. apply IHG1. apply H3.
   Defined.
+
+  Print exchange_var_r.
 
   Program Definition exchange_var : forall G1 G2 G3 (u1 u2 t:typ),
       var (G1 ++ [u1] ++ G2 ++ [u2] ++ G3) t ->
@@ -317,7 +316,145 @@ Module STLC (BT: Base).
   - eapply App; eauto.
   Defined.
 
+  (* closed values *)
+  Inductive val : typ -> Set :=
+  | Const_val : forall (c : BT.Const), val (Base (BT.base_type c))
+  | Inl_val : forall (t1 t2:typ),
+      val t1 -> val (Plus t1 t2)
+  | Inr_val : forall (t1 t2:typ),
+      val t2 -> val (Plus t1 t2)
+  | Unit_val : val One
+  | Tuple_val : forall (t1 t2:typ),
+      val t1 -> val t2 -> val (Prod t1 t2)
+  | Abs_val : forall (t1 t2:typ),
+      tm (t1::[]) t2 -> val (Arr t1 t2)
+  .
+
+  Program Definition tm_of_val (t:typ) (v:val t) : tm [] t.
+  induction v.
+  - exact (Const [] c).
+  - exact (Inl_tm [] t1 t2 IHv).
+  - exact (Inr_tm [] t1 t2 IHv).
+  - exact (Unit []).
+  - exact (Tuple [] t1 t2 IHv1 IHv2).
+  - exact (Abs [] t1 t2 t).
+  Defined.
+
+  (* eager / call-by-value evaluation *)
+  Program Definition step (t:typ) (H:tm [] t) : (tm [] t + val t).
+  remember [] as G.
+  revert HeqG.
+  induction H; intros.
+  - subst; exact (inr (Const_val c)).
+  - inversion v. subst. inversion H. subst. inversion H0.
+  - destruct (IHtm HeqG).
+    + subst; exact (inl (Err [] t t0)).
+    + inversion v.
+  - destruct (IHtm HeqG).
+    + subst. left. apply Inl_tm. exact t.
+    + right. apply Inl_val. exact v.
+  - destruct (IHtm HeqG).
+    + subst. left. apply Inr_tm. exact t.
+    + right. apply Inr_val. exact v.
+  - destruct (IHtm1 HeqG).
+    + left. subst. exact (Case_tm [] t1 t2 _ t0 H0 H1).
+    + left. inversion v; subst.
+      * replace [t1] with ([] ++ [t1] ++ []) in H0 by reflexivity.
+        exact  (subst [] [] _ _ (tm_of_val t1 H3) H0).
+      * replace [t2] with ([] ++ [t2] ++ []) in H1 by reflexivity.
+        exact  (subst [] [] _ _ (tm_of_val t2 H3) H1).
+  - right. exact Unit_val.
+  - destruct (IHtm HeqG).
+    + left. subst. eapply Fst_tm. exact t.
+    + inversion v; subst. right. exact H2.
+  - destruct (IHtm HeqG).
+    + left. subst. eapply Snd_tm. exact t.
+    + inversion v; subst. right. exact H3.
+  - destruct (IHtm1 HeqG).
+    + left. subst. eapply Tuple. exact t. exact H0.
+    + destruct (IHtm2 HeqG).
+      * left. subst. eapply Tuple. apply (tm_of_val t1 v). exact t.
+      * right. eapply Tuple_val; eauto.
+  -  subst. right. eapply Abs_val. apply H.
+  - destruct (IHtm1 HeqG).
+    + left. subst. eapply App. exact t. exact H0.
+    + destruct (IHtm2 HeqG).
+      * left. subst. eapply App. exact (tm_of_val _ v). exact t.
+      * left. inversion v. subst.
+        replace [t1] with ([] ++ [t1] ++ []) in H2 by reflexivity.
+        exact (subst [] [] _ _ (tm_of_val _ v0) H2).
+  Defined.
+
+  Lemma step_val : forall t (v : val t),
+      step t (tm_of_val t v) = inr v.
+  Proof.
+    intros t v.
+    induction v.
+    - cbv. reflexivity.
+    - cbv. cbv in IHv. rewrite IHv. reflexivity.
+    - cbv. cbv in IHv. rewrite IHv. reflexivity.
+    - cbv. reflexivity.
+    - cbv. cbv in IHv1. rewrite IHv1. cbv in IHv2. rewrite IHv2. reflexivity.
+    - cbv. reflexivity.
+  Qed.
+
+  Inductive steps : forall t, tm [] t -> val t -> Prop :=
+  | steps_val : forall t e v, step t e = inr v -> steps t e v
+  | steps_step : forall t e e' v, step t e = inl e' -> steps t e' v ->  steps t e v.
+
+  Lemma steps_val_rel : forall t v, steps t (tm_of_val t v) v.
+  Proof.
+    intros.
+    apply steps_val. apply step_val.
+  Qed.
   
+  Program Fixpoint candidate (t:typ) : tm [] t -> Prop :=
+    match t with
+    | Arr t1 t2 => fun (e : tm [] (Arr t1 t2)) =>  forall (v : val t1), candidate t2 (App _ _ _ e (tm_of_val t1 v)) 
+    | Zero => fun (e : tm [] Zero) => False
+    | _ => fun (e : tm [] _) => exists v, steps _ e v
+    end.
+  Next Obligation.
+    split. intro. inversion H0. repeat intro. inversion H0.
+  Qed.
+  Next Obligation.
+    split. intro. inversion H1. repeat intro. inversion H1.
+  Qed.
+  Next Obligation.
+    split. intro. inversion H. repeat intro. inversion H.
+  Qed.
+  Next Obligation.
+    split. intro. inversion H1. repeat intro. inversion H1.
+  Qed.
+
+  (*
+  Lemma identity_extentions : forall (t:typ) (e : tm [] t), candidate t e. 
+    induction t.
+    - intros. cbn. 
+   *)
+  (*   - intros. cbn.  *)
+  
+  
+  
+  (* Lemma strong_normalization : forall t (e : tm [] t), exists v, steps t e v. *)
+  (* Proof. *)
+  (*   induction t. *)
+  
+  Inductive uninhabited : typ -> Prop :=
+  | U_Zero : uninhabited Zero
+  | U_Plus : forall t1 t2, uninhabited t1 -> uninhabited t2 -> uninhabited (Plus t1 t2)
+  | U_Prod1 : forall t1 t2, uninhabited t1 -> uninhabited (Prod t1 t2)
+  | U_Prod2 : forall t1 t2, uninhabited t2 -> uninhabited (Prod t1 t2)
+  | U_Arr : forall t1 t2, uninhabited t2 -> uninhabited (Arr t1 t2)
+  .
+
+  (* Lemma no_closed_uninhabited : forall t (HU: uninhabited t) (e : tm [] t), False. *)
+  (* Proof. *)
+  (*   intros t HU e. *)
+  (*   remember [] as G. *)
+  (*   revert HeqG *)
+  
+                                                  
 End STLC.
 
 Module BNone : Base.
@@ -330,5 +467,13 @@ End BNone.
 Module STLC_None := STLC(BNone).
 
 
+Require ExtrOcamlBasic.
+Require ExtrOcamlString.
+Require ExtrOcamlIntConv.
+
+Extraction Language OCaml.
+Extraction Blacklist String List Char Core Z Format.
+Set Extraction AccessOpaque.
+Extraction STLC_None.
 
 
