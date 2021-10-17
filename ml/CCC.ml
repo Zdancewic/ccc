@@ -1,5 +1,6 @@
 module type CCC = sig
 
+  (*
   (* These are mostly "phantom types" that don't really have much impact *)
   type base
   type one
@@ -7,96 +8,94 @@ module type CCC = sig
   type zero
   type ('a, 'b) sum
   type ('a, 'b) exp
+   *)
 
   (* A category consists of a collection of objects and a collection of hom sets *)
-  type 'a obj
-  type ('a, 'b) hom
+  type obj
+  type hom
 
   (* There is a notion of equality of morphisms *)
-  val eq2 : ('a obj, 'b obj) hom -> ('a obj, 'b obj) hom -> bool
+  val eq2 : hom -> hom -> bool
 
   (* every object has an identity morphsym *)
-  val id : 'a obj -> ('a obj, 'a obj) hom
+  val id : obj -> hom
 
   (* There is a way of composing morphisms *)
-  val (>>>) : ('a obj, 'b obj) hom -> ('b obj, 'c obj) hom -> ('a obj, 'c obj) hom
+  val (>>>) : hom -> hom -> hom
 
   
   (* We have various ways of "naming" objects in the category *)
   (* [b] is some unspecified collection of "atomic" base objects *)
-  val b : int -> base obj
+  val b : int -> obj
 
   (* These provide ways of constructing objects in the category *)
-  val u : one obj
-  val z : unit -> zero obj
-  val prod : 'a obj -> 'b obj -> ('a, 'b) prod obj
-  val sum  : 'a obj -> 'b obj -> ('a, 'b) sum obj
-  val exp  : 'a obj -> 'b obj -> ('a, 'b) exp obj
+  val u : obj
+  val z : obj
+  val prod : obj -> obj -> obj
+  val sum  : obj -> obj -> obj
+  val exp  : obj -> obj -> obj
 
-  val zero : (zero obj, 'a obj) hom
+  val zero : hom
 
-  val inl  : 'a obj -> ('a obj, ('a obj, 'b obj) sum obj) hom
-  val inr  : 'b obj -> ('b obj, ('a obj, 'b obj) sum obj) hom
-  val case : ('a obj, 'c obj) hom -> ('b obj, 'c obj) hom -> (('a obj, 'b obj) sum obj, 'c obj) hom
+  val inl  : obj -> obj -> hom
+  val inr  : obj -> obj -> hom
+  val case : hom -> hom -> hom
 
-  val unit : 'a obj -> ('a obj, one obj) hom
+  val unit : obj -> hom
 
-  val fst  : 'a obj -> 'b obj -> (('a obj, 'b obj) prod obj, 'a obj) hom
-  val snd  : 'a obj -> 'b obj -> (('a obj, 'b obj) prod obj, 'b obj) hom
-  val pair : ('c obj, 'a obj) hom -> ('c obj, 'b obj) hom -> ('c obj, ('a obj, 'b obj) prod obj) hom
+  val fst  : obj -> obj -> hom
+  val snd  : obj -> obj -> hom
+  val pair : hom -> hom -> hom
 
-  val curry : (('a obj, 'b obj) prod obj, 'c obj) hom -> ('a obj, ('b obj, 'c obj) exp obj) hom
-  val apply : 'a obj -> 'b obj -> ((('a obj, 'b obj) exp obj, 'a obj) prod obj, 'b obj) hom
+  val curry : hom -> hom
+  val apply : obj -> obj -> hom
 
   (* For debugging *)  
-  val string_of_obj : 'a obj -> string
-  val string_of_hom : ('a, 'b) hom -> (string * string) list
+  val string_of_obj : obj -> string
+  val string_of_hom : hom -> (string * string) list
 
 end
 
 module OCaml : CCC =
 
   struct
+    type obj = unit
+    type hom =
+      | Fun : ('a -> 'b) -> hom
 
-    type base = int
-    type one = unit
-    type ('a, 'b) prod = 'a * 'b
-    type zero = | 
-    type ('a, 'b) sum =
+    let b x = ()
+    let u = ()
+    let z = ()
+    let prod x y = ()
+    let sum x y = ()
+    let exp x y = ()
+
+    type ('a,'b) sum =
       | Inl of 'a
       | Inr of 'b
-    type ('a, 'b) exp = 'a -> 'b
 
-    type 'a obj = 'a
-    type ('a, 'b) hom = 'a -> 'b
-
-    let b x = x
-    let u = ()
-    let z () = failwith "no zero obj"
-    let prod x y = (x,y)
-    let sum x y = Inl x
-    let exp x y = fun _ -> y
+    type void = | 
     
     let eq2 f g = false
-    let id x = fun a -> a
+    let id x = Fun (fun a -> a)
 
-    let (>>>) f g = fun x -> g (f x)
+    let (>>>) (Fun f) (Fun g) = Fun (fun x -> g (Obj.magic (f x)))
     
-    let zero = fun z -> begin match z with | _ -> failwith "ZERO" end
+    let zero = Fun (fun (z:void) -> begin match z with | _ -> . end)
 
-    let inl _  = fun x -> Inl x
-    let inr _ = fun y -> Inr y
-    let case f g = fun a -> begin match a with | Inl x -> f x | Inr y -> g y end
+    let inl _ _  = Fun (fun x -> Inl x)
+    let inr _ _ = Fun (fun y -> Inr y)
+    let case (Fun f) (Fun g) = Fun (fun a -> begin match a with | Inl x -> f x | Inr y -> (Obj.magic g y) end)
 
-    let unit _ = fun _ -> ()
+    let unit _ = Fun (fun _ -> ())
 
-    let fst _ _ (x, y) = x
-    let snd _ _ (x, y) = y
-    let pair f g = fun c -> (f c, g c)
+    let fst _ _ = Fun fst
+    let snd _ _ = Fun snd
+    let pair (Fun f) (Fun g) = Fun (fun c -> (f c, (Obj.magic g c)))
 
-    let curry f = fun x y -> f (x, y)
-    let apply _ _ (f, x) = f x
+    let curry (Fun f) = Fun (fun x y -> (Obj.magic f (x, y)))
+    let apply _ _ = Fun (fun (f, x) -> f x)
 
     let string_of_obj _ = "<obj>"
-    let string_of_hom _ = [("in", "ou")]
+    let string_of_hom _ = [("in", "out")]
   end

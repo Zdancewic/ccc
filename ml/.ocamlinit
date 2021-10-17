@@ -2,3 +2,8 @@
 #directory "_build";;
 #load "StringLib.cmo";;
 #load "Atom.cmo";;
+#load "FinSet.cmo";;
+#load "STLC.cmo";;
+#load "CCC.cmo";;
+#load "Denotation.cmo";;
+#load "Top.cmo";;

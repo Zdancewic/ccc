@@ -30,8 +30,25 @@ type tm =
   | Fst of typ * typ * tm
   | Snd of typ * typ * tm
   | Pair of typ * typ * tm * tm
-  | Abs of tm * tm * tm
+  | Abs of typ * typ * tm
   | App of typ * typ * tm * tm
+
+
+(* fun (x:B(2)) -> x *)
+let ex1 : tm =
+  Abs(Base 2, Base 2, Var Z)
+
+(* fun (x:Unit + Unit) -> x *)
+let bool_t = Plus(One, One)
+let ex2 : tm =
+  Abs(bool_t, bool_t, Var Z)
+
+let ex3 : tm =
+  App(bool_t, bool_t, ex2, (Inl(One, One, Unit)))
+
+let ex4 : tm =
+  Abs(bool_t, bool_t,
+      Case(One, One, bool_t, (Var Z), (Inr(One, One, Var Z)), (Inl(One, One, Var Z))))
 
 
 (*

@@ -3,15 +3,17 @@
 
 module FinSet : CCC = struct
 
+  (*
   type base = Atom.t
   type one = Atom.t
   type ('a, 'b) prod = Atom.t
   type zero = Atom.t
   type ('a, 'b) sum = Atom.t
   type ('a, 'b) exp = Atom.t
+   *)
 
-  type 'a obj = AtomSet.t
-  type ('a, 'b) hom = Atom.t AtomMap.t
+  type obj = AtomSet.t
+  type hom = Atom.t AtomMap.t
 
   let eq2 f g = AtomMap.compare Atom.compare f g = 0
 
@@ -29,6 +31,8 @@ module FinSet : CCC = struct
 
   (* one is the same as the singleton set {0} *)
   let u = b 1
+
+  let z = b 0
   
   let zero = AtomMap.empty
 
@@ -38,8 +42,8 @@ module FinSet : CCC = struct
       (AtomSet.map (fun x -> Atom.Inl x) a)
       (AtomSet.map (fun y -> Atom.Inr y) b)
 
-  let inl a = AtomSet.fold (fun x m -> AtomMap.add x (Atom.Inl x) m) a AtomMap.empty
-  let inr b = AtomSet.fold (fun x m -> AtomMap.add x (Atom.Inr x) m) b AtomMap.empty
+  let inl a b = AtomSet.fold (fun x m -> AtomMap.add x (Atom.Inl x) m) a AtomMap.empty
+  let inr a b = AtomSet.fold (fun x m -> AtomMap.add x (Atom.Inr x) m) b AtomMap.empty
   let case f g =
     let m = AtomMap.fold (fun k v m -> AtomMap.add (Atom.Inl k) v m) f AtomMap.empty in
     AtomMap.fold (fun k v m -> AtomMap.add (Atom.Inr k) v m) g m
@@ -48,7 +52,7 @@ module FinSet : CCC = struct
   let unit a = AtomSet.fold (fun x m -> AtomMap.add x (Atom.Base 0) m) a AtomMap.empty
 
   (* the cartesian product of two finite sets *)
-  let prod (a : 'a obj) (b  : 'b obj) : ('a, 'b) prod obj =
+  let prod a b  =
     AtomSet.fold
       (fun ai s ->
         AtomSet.fold
@@ -67,7 +71,7 @@ module FinSet : CCC = struct
   
   (* Assumes that dom(f) and dom(g) are the same! *)
   let pair f g =
-    AtomMap.fold (fun k x m -> AtomMap.add x (Atom.Prod(x, AtomMap.find k g)) m) f AtomMap.empty
+    AtomMap.fold (fun k x m -> AtomMap.add k (Atom.Prod(x, AtomMap.find k g)) m) f AtomMap.empty
 
 
 
@@ -89,7 +93,7 @@ module FinSet : CCC = struct
      to the set
 
   *)
-  let exp (a : 'a obj) (b : 'b obj) :  AtomSet.t =
+  let exp (a : obj) (b : obj) :  AtomSet.t =
     let base = AtomSet.singleton (Atom.Map (AtomMap.empty)) in
     let extend (ai : Atom.t) (f : Atom.t AtomMap.t) : AtomSet.t =
       AtomSet.fold (fun bj s -> AtomSet.add (Atom.Map (AtomMap.add ai bj f)) s) b AtomSet.empty
