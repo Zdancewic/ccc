@@ -1,0 +1,1 @@
+fun (x : One -> One -> One) (y : One) -> x y y

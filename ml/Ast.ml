@@ -24,18 +24,20 @@ type bnd = id * ty node                  (* x : ty *)
 type exp =
   | Const of int * ty node               (* const[i : t] *)
   | Id of id                             (* x *)
-  | Unit                                 (* () *)
+  | Abort                                (* abort (must be applied) *)
   | Inl of exp node                      (* inl(e) *)
   | Inr of exp node                      (* inr(e) *)
   | Case of exp node
             * id * exp node
             * id * exp node              (* begin match e with | inl(x) -> e1 | inr(y) -> e2 end *)
+  | Unit                                 (* () *)
+  | Fst                                  (* fst (must be applied) *)
+  | Snd                                  (* snd (must be applied) *)
   | Pair of exp node * exp node          (* ( e1 , e2 ) *)
-  | Fst of exp node                      (* fst e *)
-  | Snd of exp node                      (* snd e *)
   | Let of bnd * exp node * exp node     (* let x : ty = e1 in e2 *)
   | Lam of bnd list * exp node           (* fun (x1 : ty1) ... (xn : tyn) -> e *)
   | App of exp node * exp node           (* e1 e2 *)
 
 
 type prog = tydef list * exp node
+

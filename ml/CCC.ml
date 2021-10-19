@@ -35,7 +35,7 @@ module type CCC = sig
   val sum  : obj -> obj -> obj
   val exp  : obj -> obj -> obj
 
-  val zero : hom
+  val zero : obj -> hom
 
   val inl  : obj -> obj -> hom
   val inr  : obj -> obj -> hom
@@ -81,7 +81,7 @@ module OCaml : CCC =
 
     let (>>>) (Fun f) (Fun g) = Fun (fun x -> g (Obj.magic (f x)))
     
-    let zero = Fun (fun (z:void) -> begin match z with | _ -> . end)
+    let zero _ = Fun (fun (z:void) -> begin match z with | _ -> . end)
 
     let inl _ _  = Fun (fun x -> Inl x)
     let inr _ _ = Fun (fun y -> Inr y)

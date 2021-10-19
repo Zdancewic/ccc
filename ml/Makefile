@@ -1,13 +1,25 @@
 LIBS = unix,str,nums
+BUILDFLAGS = -use-menhir -yaccflag --explain -tag debug
+OCAMLFLAGS = -g
+
+FILES = $(wildcard *.ml) Parser.mly Lexer.mll
 
 all: Main.native
 
 Parser.ml:
-	ocamlbuild -libs $(LIBS) Parser.ml -use-menhir -yaccflag --explain
+	ocamlbuild -libs $(LIBS) Parser.ml $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
 
 .PHONY: Main.native
-Main.native: 
-	ocamlbuild -libs $(LIBS) Main.native -use-menhir -yaccflag --explain
+
+%.native: $(FILES)
+	ocamlbuild -libs $(LIBS) $@.native $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
+
+%.byte: $(FILES)
+	ocamlbuild -libs $(LIBS) $@ $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
+
+
+utop: Top.byte
+	utop
 
 .PHONY: clean
 clean:

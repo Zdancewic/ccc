@@ -19,9 +19,13 @@ module FinSet : CCC = struct
 
   let id a = AtomSet.fold (fun x m -> AtomMap.add x x m)  a AtomMap.empty
   let (>>>) f g =
-    AtomMap.fold (fun k v m ->
-        AtomMap.add k (AtomMap.find v g) m) f AtomMap.empty
+    try
+      AtomMap.fold (fun k v m ->
+          AtomMap.add k (AtomMap.find v g) m) f AtomMap.empty
+    with
+    | Not_found -> Printf.printf ("f = %s\n\ng = %s\n\n") (Atom.to_string (Atom.Map f)) (Atom.to_string (Atom.Map g)); failwith "ABORT"
 
+  
   (* In FinSet, [b x] is the Finite Set {0, 1, ..., x} *)
   let b x =
     let rec loop n acc =
@@ -34,7 +38,7 @@ module FinSet : CCC = struct
 
   let z = b 0
   
-  let zero = AtomMap.empty
+  let zero _ = AtomMap.empty
 
   (* the disjoint union of two sets *)
   let sum a b =

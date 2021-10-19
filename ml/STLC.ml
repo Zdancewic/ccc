@@ -21,7 +21,7 @@ type lit = int * typ
 type tm =
   | Const of lit    (* Const(i,t) : t *)
   | Var of var
-  | Err of tm       (* Abort *)
+  | Err of typ * tm       (* Abort *)
   | Inl of typ * typ * tm
   | Inr of typ * typ * tm
   (* case t1 t2 t (e : (t1+t2)) (br1 : t1 |- t) (br2 : t2 |- t) *)  
@@ -46,6 +46,7 @@ let ex2 : tm =
 let ex3 : tm =
   App(bool_t, bool_t, ex2, (Inl(One, One, Unit)))
 
+(* fun x -> begin match z with | inl(x) -> inr(x) | inr(x) -> inl(x) end *)
 let ex4 : tm =
   Abs(bool_t, bool_t,
       Case(One, One, bool_t, (Var Z), (Inr(One, One, Var Z)), (Inl(One, One, Var Z))))

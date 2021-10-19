@@ -40,7 +40,8 @@
   ("snd", SND);
   ("let", LET);
   ("in", IN);
-  ("fun", FUN);    
+  ("fun", FUN);
+  ("abort", ABORT);
 
   (* Symbols *)
   ( ",", COMMA);

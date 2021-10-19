@@ -19,8 +19,6 @@ let prec_of_exp = function
 | App(_,_) -> 10
 | Let(_,_,_) -> 50
 | Lam(_,_) -> 50
-| Fst(_) -> 80
-| Snd(_) -> 80
 | _ -> 130
 
 
@@ -95,8 +93,8 @@ and print_exp_aux level fmt e =
 
   | Id id -> print_id_aux fmt id
 
-  | Unit -> pps "()"
-
+  | Abort -> pps "abort"
+        
   | Inl e -> pps "inl("; print_exp_aux 0 fmt e; pps ")"
 
   | Inr e -> pps "inr("; print_exp_aux 0 fmt e; pps ")"
@@ -113,11 +111,13 @@ and print_exp_aux level fmt e =
      pps "end";
      pp_close_box fmt ()
 
+  | Unit -> pps "()"
+
   | Pair(e1, e2) -> pps "("; print_exp_aux 0 fmt e1; pps ", "; print_exp_aux 0 fmt e2; pps ")"
 
-  | Fst e -> pps "fst "; print_exp_aux this_level fmt e
+  | Fst -> pps "fst"
 
-  | Snd e -> pps "snd "; print_exp_aux this_level fmt e
+  | Snd -> pps "snd"
 
   | Let((x, t), e1, e2) ->
      pp_open_box fmt 0;
@@ -136,7 +136,7 @@ and print_exp_aux level fmt e =
      pp_close_box fmt ()
 
   | App(e1, e2) ->
-     print_exp_aux 100 fmt e1; ppsp (); print_exp_aux 100 fmt e2
+     print_exp_aux this_level fmt e1; ppsp (); print_exp_aux 100 fmt e2
 
   end; if this_level < level then pps ")"
 
