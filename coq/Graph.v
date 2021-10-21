@@ -604,14 +604,3 @@ Section CartesianClosed.
     replace (elt_map0 (tt_I, tgt A e)) with ((tgt (I ⊗ A) >>> elt_map0) (tt_I, e)) by reflexivity.
     rewrite tgt_map0.
     replace (tgt B (elt_map0 (ss_I, e))) with ((elt_map0 >>> tgt B) (ss_I, e)) by reflexivity.
-    
-    
-
-    
-    
-    
-      
-
-  
-Instance Curry_Fun : Curry Fun prod Fun :=
-  fun {A B C} f => fun c a => f (c, a).

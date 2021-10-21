@@ -98,8 +98,6 @@ Module STLC (BT: Base).
     + apply swap_var. apply VarS. apply IHG1. apply H3.
   Defined.
 
-  Print exchange_var_r.
-
   Program Definition exchange_var : forall G1 G2 G3 (u1 u2 t:typ),
       var (G1 ++ [u1] ++ G2 ++ [u2] ++ G3) t ->
       var (G1 ++ [u2] ++ G2 ++ [u1] ++ G3) t.                                           
@@ -467,13 +465,13 @@ End BNone.
 Module STLC_None := STLC(BNone).
 
 
-Require ExtrOcamlBasic.
-Require ExtrOcamlString.
-Require ExtrOcamlIntConv.
+(* Require ExtrOcamlBasic. *)
+(* Require ExtrOcamlString. *)
+(* Require ExtrOcamlIntConv. *)
 
-Extraction Language OCaml.
-Extraction Blacklist String List Char Core Z Format.
-Set Extraction AccessOpaque.
-Extraction STLC_None.
+(* Extraction Language OCaml. *)
+(* Extraction Blacklist String List Char Core Z Format. *)
+(* Set Extraction AccessOpaque. *)
+(* Extraction STLC_None. *)
 
 

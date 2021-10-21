@@ -1,8 +1,8 @@
 %{
 open Ast
 
-let loc (startpos:Lexing.position) (endpos:Lexing.position) (elt:'a) : 'a node =
-  { elt ; loc=Range.mk_lex_range startpos endpos }
+let loc (startpos:Lexing.position) (endpos:Lexing.position) (elt:'a) : ('d, 'a) node =
+  { elt ; loc=Range.mk_lex_range startpos endpos ; dec=None }
 
 %}
 
@@ -51,10 +51,10 @@ let loc (startpos:Lexing.position) (endpos:Lexing.position) (elt:'a) : 'a node =
 
 %start prog
 %start exp_top
-%type <Ast.exp Ast.node> exp_top
-%type <Ast.prog> prog
-%type <Ast.exp Ast.node> exp
-%type <Ast.ty node> ty
+%type <(unit, unit Ast.exp) Ast.node> exp_top
+%type <unit Ast.prog> prog
+%type <(unit, unit Ast.exp) Ast.node> exp
+%type <(unit, unit Ast.ty) node> ty
 
 %%
 

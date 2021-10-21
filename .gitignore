@@ -27,3 +27,4 @@
 .lia.cache
 *.cache
 **.depend
+**.byte

@@ -155,7 +155,7 @@ let print_tydef_aux fmt (tid, t) =
   pp_close_box fmt ()
   
 
-let print_prog_aux fmt (p:prog) =
+let print_prog_aux fmt (p:'d prog) =
   let ppnl = pp_force_newline fmt in
   pp_open_vbox fmt 0;
   List.iter (fun td -> print_tydef_aux fmt td; ppnl (); ppnl ()) (fst p);
@@ -169,15 +169,15 @@ let print ppx x : unit =
   pp_close_box std_formatter ();
   pp_print_newline std_formatter ()
 
-let print_prog (p:prog) : unit = print print_prog_aux p
-let string_of_prog (p:prog) : string = string_of print_prog_aux p
+let print_prog (p:'d prog) : unit = print print_prog_aux p
+let string_of_prog (p:'d prog) : string = string_of print_prog_aux p
 
-let print_ty (t:ty node) : unit = print (print_ty_aux 0) t
-let string_of_ty (t:ty node) : string = string_of (print_ty_aux 0) t
+let print_ty (t:(unit, ty) node) : unit = print (print_ty_aux 0) t
+let string_of_ty (t:(unit, ty) node) : string = string_of (print_ty_aux 0) t
 
-let print_exp (e:exp node) : unit = print (print_exp_aux 0) e
-let string_of_exp (e:exp node) : string = string_of (print_exp_aux 0) e
+let print_exp (e:('d, 'd exp) node) : unit = print (print_exp_aux 0) e
+let string_of_exp (e:('d, 'd exp) node) : string = string_of (print_exp_aux 0) e
 
-let print_ty (t:ty node) : unit = print (print_ty_aux 0) t
-let string_of_ty (t:ty node) : string = string_of (print_ty_aux 0) t
+let print_ty (t:(unit, ty) node) : unit = print (print_ty_aux 0) t
+let string_of_ty (t:(unit, ty) node) : string = string_of (print_ty_aux 0) t
 

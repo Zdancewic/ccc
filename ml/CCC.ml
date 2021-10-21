@@ -35,19 +35,43 @@ module type CCC = sig
   val sum  : obj -> obj -> obj
   val exp  : obj -> obj -> obj
 
+  (* zero A : 0 ==> A *)
   val zero : obj -> hom
 
+  (* inl A B : A ==> A + B *)
   val inl  : obj -> obj -> hom
+
+  (* inr A B : B ==> A + B *)
   val inr  : obj -> obj -> hom
+
+  (* f : A ==> C
+     g : B ==> C
+     case f g : A + B ==> C
+   *)
   val case : hom -> hom -> hom
 
+  (* unit A : A ==> 1 *)
   val unit : obj -> hom
 
+  (* fst A B : A * B ==> A *)
   val fst  : obj -> obj -> hom
+
+  (* snd A B : A * B ==> B *)
   val snd  : obj -> obj -> hom
+
+
+  (* f : C ==> A
+     g : C ==> B
+     pair f g : C ==> A * B
+   *)
   val pair : hom -> hom -> hom
 
+  (* f : A * B ==> C 
+     curry f : A ==> [B -> C]
+   *)
   val curry : hom -> hom
+
+  (* apply A B : [A -> B] * A ==> B *)
   val apply : obj -> obj -> hom
 
   (* For debugging *)  

@@ -12,7 +12,7 @@ Parser.ml:
 .PHONY: Main.native
 
 %.native: $(FILES)
-	ocamlbuild -libs $(LIBS) $@.native $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
+	ocamlbuild -libs $(LIBS) $@ $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
 
 %.byte: $(FILES)
 	ocamlbuild -libs $(LIBS) $@ $(BUILDFLAGS) -cflags $(OCAMLFLAGS)

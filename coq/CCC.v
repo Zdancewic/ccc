@@ -77,16 +77,6 @@ Module Denotation(BT : Base).
   - eapply cat. exact snd_. apply IHv.
   Defined. 
 
-  (* Program Definition distribute {a b c d} :  *)
-  (*    C a (PROD (SUM b c) d) -> C a (SUM (PROD b d) (PROD c d)).  *)
-
- (* (f : a -> (b + c) * d ) =>
-     fun (x:a) =>
-       let (y, z) = f a in
-       case y of
-       | inl w => inl (w, z)
-       | inr w => inr (w ,z) *)
-  
   Program Definition denote_tm {G:ctx} {t:typ} (e : tm G t) : C (denote_ctx G) (denote_typ t).
   induction e.
   - eapply cat. exact one. exact (denote_Const c).
@@ -118,19 +108,7 @@ Module Denotation(BT : Base).
     dependent induction e; (split; [intros e' Hans | intros v' Hans]).
     - cbn in H. rewrite Hans in H; inversion H.
     - cbn in H. rewrite Hans in H; inversion H. subst. cbn. reflexivity.
-    - inversion v.
-    - inversion v.
-    - 
-
-      assert (([] : list typ) ~= ([] : list typ)).
-      { reflexivity. }
-      assert ((e : tm [] Zero) ~= (e : tm [] Zero)).
-      { reflexivity. }
-      assert (step Zero e = inl e).
-
-      specialize (IHe e H0 H1 (inl e)).
-      cbv in H. rewrite Hans in H. 
-  Admitted    
+  Abort.
       
 
   
