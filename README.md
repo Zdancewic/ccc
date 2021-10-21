@@ -1,15 +1,15 @@
 # Implementing Cartesian Closed Categories
 
 This repo is an elementary implementation of Simply Typed Lambda Calculus (STLC)
-and its semantics in terms of Cartesian Closed Categories.
+and its semantics in terms of Cartesian Closed Categories.  It is not particularly well documented (yet!).
 
 # Installation
 
 
 ## Dependencies
 
-This project uses [https://github.com/DeepSpec/InteractionTrees/](Interaction
-Trees) (currently as a git submodule) as the basis for its category theory
+This project uses [Interaction
+Trees](https://github.com/DeepSpec/InteractionTrees/) (currently as a git submodule) as the basis for its category theory
 definitions.
 
 The OCaml code depends on `menhir` and `utop`, which can be installed via:
