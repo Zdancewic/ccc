@@ -126,12 +126,7 @@ module Denote (C : CCC) = struct
 
   
   let pp_denotation (f : Format.formatter) (h : hom) : unit =
-    let open Format in
-    let pps f () = pp_print_string f ","; pp_print_space f () in
-    pp_print_list ~pp_sep:pps 
-      (fun f (l,r) -> pp_print_string f (l ^ " -> " ^ r))
-      f
-      (C.string_of_hom h)
+    C.pp_hom f h
         
   let string_of ppx x : string =
     let open Format in 

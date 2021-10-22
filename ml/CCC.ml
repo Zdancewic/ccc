@@ -75,8 +75,10 @@ module type CCC = sig
   val apply : obj -> obj -> hom
 
   (* For debugging *)  
+  val pp_obj : Format.formatter -> obj -> unit
   val string_of_obj : obj -> string
-  val string_of_hom : hom -> (string * string) list
+  val pp_hom : Format.formatter -> hom -> unit
+  val string_of_hom : hom -> string
 
 end
 
@@ -120,6 +122,8 @@ module OCaml : CCC =
     let curry (Fun f) = Fun (fun x y -> (Obj.magic f (x, y)))
     let apply _ _ = Fun (fun (f, x) -> f x)
 
+    let pp_obj _ _ = ()
+    let pp_hom _ _ = ()                     
     let string_of_obj _ = "<obj>"
-    let string_of_hom _ = [("in", "out")]
+    let string_of_hom _ = "<in -> out>"
   end

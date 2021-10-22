@@ -1,5 +1,8 @@
 ;; open StringLib
 
+
+let pretty = ref false 
+    
 (*
   This is a type for "finite sets" with some structure.  Atom.t forms a total order
   and we can therefore put them into Set data structures.
@@ -47,6 +50,7 @@ module
       | Map of t AtomMap.t
     
     val compare : t -> t -> int
+    val pp : Format.formatter -> t -> unit
     val to_string : t -> string
   end =
   
@@ -85,21 +89,44 @@ module
       | Map _, _ -> 1
       end
 
-    let rec to_string t =
+    let rec pp (f : Format.formatter) t =
+      let open Format in
+      let ps = pp_print_space f in
+      let pps = pp_print_string f in
       begin match t with
-      | Base x -> Int.to_string x
-      | Inl x -> "Inl " ^ (to_string x)
-      | Inr x -> "Inr " ^ (to_string x)
-      | Prod(x,y) -> "(" ^ (to_string x) ^ "," ^ (to_string y) ^ ")"
-      | Map m ->
-         let s = String.concat ", "
-                   (List.map 
-                      (fun (k,v) -> (to_string k) ^ "->" ^ (to_string v))
-                      (AtomMap.bindings m) )
-         in
-         "[" ^ s ^ "]"
+        | Base x -> pp_print_int f x
+        | Inl x ->
+          if !pretty && x = (Base 0)
+          then pps "T"
+          else (pps "Inl"; ps (); pp f x)
+        | Inr x ->
+          if !pretty && x = (Base 0)
+          then pps "F"
+          else (pps "Inr"; ps (); pp f x)
+        | Prod(x,y) ->
+          pp_open_hbox f ();
+          pps "("; pp f x; pps ","; ps (); pp f y; pps ")";
+          pp_close_box f ()
+        | Map m ->
+          pps "["; pp_open_hovbox f 0;
+          (pp_print_list ~pp_sep:(fun f () -> pp_print_string f ","; pp_print_space f ())
+            (fun f (k,v) -> pp f k; pp_print_string f " -> "; pp f v)
+            f
+            (AtomMap.bindings m));
+          pp_close_box f ();          
+          pps "]"
       end
-         
+
+
+  let string_of ppx x : string =
+    let open Format in 
+    pp_open_hvbox str_formatter 0;
+    ppx str_formatter x;
+    pp_close_box str_formatter ();
+    flush_str_formatter ()
+
+  let to_string t : string =
+    string_of pp t
     
   end
 

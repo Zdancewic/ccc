@@ -150,12 +150,37 @@ module FinSet : CCC = struct
     in
     AtomSet.fold (fun p m -> AtomMap.add p (app p) m) pairs AtomMap.empty
 
-  let string_of_obj o =
-    let s = String.concat ", " (List.map Atom.to_string (AtomSet.elements o)) in
-    "{" ^ s ^ "}"
+  let pp_obj f o =
+    let open Format in
+    pp_print_string f "{";
+    pp_open_hovbox f 1;
+    pp_print_list ~pp_sep:(fun f () -> pp_print_string f ","; pp_print_space f ()) Atom.pp f (AtomSet.elements o);
+    pp_print_string f "}";
+    pp_close_box f ()
 
-  let string_of_hom (m : Atom.t AtomMap.t) : (string * string) list =
-    let ls = AtomMap.bindings m in
-    List.map (fun (k,v) -> (Atom.to_string k, Atom.to_string v)) ls
+  let pp_hom f h =
+    let open Format in
+    let pps = pp_print_string f in
+    
+    pps "["; pp_open_hovbox f 0;
+    (pp_print_list ~pp_sep:(fun f () -> pp_print_string f ","; pp_print_space f ())
+       (fun f (k,v) -> Atom.pp f k; pp_print_string f " ==> "; Atom.pp f v)
+       f
+       (AtomMap.bindings h));
+    pp_close_box f ();          
+    pps "]"
+      
+  let string_of ppx x : string =
+    let open Format in 
+    pp_open_hvbox str_formatter 0;
+    ppx str_formatter x;
+    pp_close_box str_formatter ();
+    flush_str_formatter ()
+      
+  let string_of_obj o =
+    string_of pp_obj o
+
+  let string_of_hom (m : Atom.t AtomMap.t) : string =
+    string_of pp_hom m
   
 end

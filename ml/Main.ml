@@ -8,6 +8,7 @@ let args =
   [ 
     ("-op", Set_string Platform.output_path, "set the path to the output files directory  [default='output']")
   ; ("-v", Unit Platform.enable_verbose, "enables more verbose compilation output")
+  ; ("-pa", Set Atom.pretty, "turn on pretty printing of atoms ")
   ] 
 
 
