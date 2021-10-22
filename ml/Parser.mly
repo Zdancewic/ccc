@@ -43,8 +43,9 @@ let loc (startpos:Lexing.position) (endpos:Lexing.position) (elt:'a) : ('d, 'a) 
 %token COLON    /* : */
 %token UNIT     /* () */
 
-%right PLUS STAR
 %right ARROW
+%right PLUS STAR
+
 
 
 /* ---------------------------------------------------------------------- */
@@ -54,13 +55,12 @@ let loc (startpos:Lexing.position) (endpos:Lexing.position) (elt:'a) : ('d, 'a) 
 %type <(unit, unit Ast.exp) Ast.node> exp_top
 %type <unit Ast.prog> prog
 %type <(unit, unit Ast.exp) Ast.node> exp
-%type <(unit, unit Ast.ty) node> ty
+%type <(unit, Ast.ty) node> ty
 
 %%
 
 exp_top:
   | e=exp EOF { e }
-
 
 prog:
   | ts=list(tydef) e=exp_top  { (ts,e) }

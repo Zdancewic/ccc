@@ -23,7 +23,9 @@ module FinSet : CCC = struct
       AtomMap.fold (fun k v m ->
           AtomMap.add k (AtomMap.find v g) m) f AtomMap.empty
     with
-    | Not_found -> Printf.printf ("f = %s\n\ng = %s\n\n") (Atom.to_string (Atom.Map f)) (Atom.to_string (Atom.Map g)); failwith "ABORT"
+    | Not_found -> Printf.printf ("f = %s\n\ng = %s\n\n")
+                     (Atom.to_string (Atom.Map f))
+                     (Atom.to_string (Atom.Map g)); failwith "ERROR: f >>> g FAILED"
 
   
   (* In FinSet, [b x] is the Finite Set {0, 1, ..., x} *)

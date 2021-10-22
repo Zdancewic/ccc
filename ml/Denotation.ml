@@ -64,8 +64,8 @@ module Denote (C : CCC) = struct
    *)
   let rec denote_var (g:ctx) (v:var) : hom =
     begin match g, v with
-    | [] , _ -> failwith "denote_var: variable not bound"
-    | t::g', Z -> C.fst (denote_typ t) (denote_ctx g')
+    | [] , _     -> failwith "denote_var: variable not bound"
+    | t::g', Z   -> C.fst (denote_typ t) (denote_ctx g')
     | t::g', S n -> (C.snd (denote_typ t) (denote_ctx g')) >>> (denote_var g' n)
     end
 
@@ -74,36 +74,73 @@ module Denote (C : CCC) = struct
   let denote_tm (c:int -> hom) (g:ctx) (e:tm) : hom =
     let rec denote (g:ctx) (e:tm) = 
       begin match e with
-      | Const (n,t) -> (unit (denote_ctx g)) >>> (c n)
-      | Var v -> denote_var g v
-      | Err(t, e) -> (denote g e) >>> (zero (denote_typ t))
-      | Inl(t, u, e) -> (denote g e) >>> (inl (denote_typ t) (denote_typ u))
-      | Inr(t, u, e) -> (denote g e) >>> (inr (denote_typ t) (denote_typ u))
-      | Case(t, u, r, e, lft, rgt)  ->
-         let dg = denote_ctx g in 
-         (pair
-            ((denote g e)
-                >>>
-                  (case
-                     (curry (denote (t::g) lft))
-                     (curry (denote (u::g) rgt))
-                  ))
-            (id dg))
-          >>> (apply dg (denote_typ r))
-      | Unit -> unit (denote_ctx g)
-      | Fst(t, u, e) -> (denote g e) >>> (fst (denote_typ t) (denote_typ u))
-      | Snd(t, u, e) -> (denote g e) >>> (snd (denote_typ t) (denote_typ u))
-      | Pair(t, u, e1, e2) -> pair (denote g e1) (denote g e2)
-      | Abs(t, u, e) ->
-         curry ((swap (denote_ctx g) (denote_typ t)) >>> (denote (t::g) e))
+        | Const (n,t) ->
+          (unit (denote_ctx g)) >>> (c n)
+                                    
+        | Var v ->
+          denote_var g v
 
-      | App(t, u, e1, e2) ->
-         (pair (denote g e1) (denote g e2)) >>> (apply (denote_typ t) (denote_typ u))
+        | Err(t, e) ->
+          (denote g e) >>> (zero (denote_typ t))
+
+        | Inl(Plus(t, u), e) ->
+          (denote g e) >>> (inl (denote_typ t) (denote_typ u))
+
+        | Inr(Plus(t, u), e) ->
+          (denote g e) >>> (inr (denote_typ t) (denote_typ u))
+
+        | Case(Plus(t, u), r, e, lft, rgt)  ->
+          let dg = denote_ctx g in 
+          (pair
+             ((denote g e)
+              >>>
+              (case
+                 (curry (denote (t::g) lft))
+                 (curry (denote (u::g) rgt))
+              ))
+             (id dg))
+          >>> (apply dg (denote_typ r))
+              
+        | Unit ->
+          unit (denote_ctx g)
+
+        | Fst(Prod(t, u), e) ->
+          (denote g e) >>> (fst (denote_typ t) (denote_typ u))
+
+        | Snd(Prod(t, u), e) ->
+          (denote g e) >>> (snd (denote_typ t) (denote_typ u))
+
+        | Pair(Prod(t, u), e1, e2) ->
+          pair (denote g e1) (denote g e2)
+
+        | Abs(t, e) ->
+          curry ((swap (denote_ctx g) (denote_typ t)) >>> (denote (t::g) e))
+
+        | App(Arr(t, u), e1, e2) ->
+          (pair (denote g e1) (denote g e2)) >>> (apply (denote_typ t) (denote_typ u))
+
+        | _ -> failwith "ERROR: Denotation - type annotation mismatch"
       end
     in
     denote g e
-         
-  
 
+  
+  let pp_denotation (f : Format.formatter) (h : hom) : unit =
+    let open Format in
+    let pps f () = pp_print_string f ","; pp_print_space f () in
+    pp_print_list ~pp_sep:pps 
+      (fun f (l,r) -> pp_print_string f (l ^ " -> " ^ r))
+      f
+      (C.string_of_hom h)
+        
+  let string_of ppx x : string =
+    let open Format in 
+    pp_open_hvbox str_formatter 0;
+    ppx str_formatter x;
+    pp_close_box str_formatter ();
+    flush_str_formatter ()
+
+  let string_of_denotation (h:hom) : string =
+    string_of pp_denotation h
   
 end  

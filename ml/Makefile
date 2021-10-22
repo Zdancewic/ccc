@@ -9,8 +9,6 @@ all: Main.native
 Parser.ml:
 	ocamlbuild -libs $(LIBS) Parser.ml $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
 
-.PHONY: Main.native
-
 %.native: $(FILES)
 	ocamlbuild -libs $(LIBS) $@ $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
 

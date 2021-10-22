@@ -1,9 +1,14 @@
 #use "topfind";;
 #directory "_build";;
-#load "StringLib.cmo";;
+#load "Range.cmo";;
 #load "Atom.cmo";;
 #load "FinSet.cmo";;
 #load "STLC.cmo";;
 #load "CCC.cmo";;
 #load "Denotation.cmo";;
+#load "Ast.cmo";;
+#load "AstLib.cmo";;
+#load "Typecheck.cmo";;
+#load "Platform.cmo";;
+#load "Driver.cmo";;
 #load "Top.cmo";;
