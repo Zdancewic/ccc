@@ -1,1 +1,1 @@
-let x : One + One = inl(()) in x
+let x : One + One = inl () in x

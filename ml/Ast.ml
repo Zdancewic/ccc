@@ -25,8 +25,8 @@ type 'd exp =
   | Const of int * (unit, ty) node               (* const[i : t] *)
   | Id of id                             (* x *)
   | Abort                                (* abort (must be applied) *)
-  | Inl of ('d, 'd exp) node                      (* inl(e) *)
-  | Inr of ('d, 'd exp) node                      (* inr(e) *)
+  | Inl 
+  | Inr 
   | Case of ('d, 'd exp) node
             * id * ('d, 'd exp) node
             * id * ('d, 'd exp) node              (* begin match e with | inl(x) -> e1 | inr(y) -> e2 end *)

@@ -196,19 +196,7 @@ module Infer = struct
         in
         tt, [], (decorate (Ast.Id x) e.loc tt)
 
-      | Abort | Fst | Snd -> error e.loc "This term must be applied"
-
-      | Inl e' ->
-        let (lt, eqns, de) = elaborate tc g e' in
-        let rt = Unify.fresh_uvar () in
-        let tt = Unify.Plus(lt, rt) in
-        tt, eqns, (decorate (Ast.Inl de) e.loc tt)
-
-      | Inr e' ->
-        let (rt, eqns, de) = elaborate tc g e' in
-        let lt = Unify.fresh_uvar () in
-        let tt = Unify.Plus(lt, rt) in
-        tt, eqns, (decorate (Ast.Inr de) e.loc tt)
+      | Abort | Inl | Inr | Fst | Snd -> error e.loc "This term must be applied"
 
       | Case(e1, x, e2, y, e3) ->
         let lt = Unify.fresh_uvar () in
@@ -252,6 +240,18 @@ module Infer = struct
             decorate (Ast.App(decorate Ast.Abort e1.loc Unify.Zero,
                               de2)) e.loc tt
 
+          | Inl ->
+            let rt = Unify.fresh_uvar () in
+            let tt = Unify.Plus(te2, rt) in
+            tt, eqns2,
+            (decorate (Ast.App(decorate Ast.Inl e1.loc Unify.Zero, de2)) e.loc tt)
+                      
+          | Inr ->
+            let lt = Unify.fresh_uvar () in
+            let tt = Unify.Plus(lt, te2) in
+            tt, eqns2,
+            (decorate (Ast.App(decorate Ast.Inr e1.loc Unify.Zero, de2)) e.loc tt)
+          
           | Fst ->
             let tl = Unify.fresh_uvar () in
             let tr = Unify.fresh_uvar () in
@@ -302,9 +302,7 @@ module Infer = struct
   and apply_subst_exp (s : Unify.subst) e =
     let sub = apply_subst s in 
     begin match e with
-      | Const(_,_) | Id _ | Abort | Unit | Fst | Snd -> e
-      | Inl e -> Inl (sub e)
-      | Inr e -> Inr (sub e)
+      | Const(_,_) | Id _ | Abort | Inl | Inr | Unit | Fst | Snd -> e
       | Case(e1, x, e2, y, e3) -> Case(sub e1, x, sub e2, y, sub e3)
       | Pair(e1, e2) -> Pair(sub e1, sub e2)
       | Let(b, e1, e2) -> Let(b, sub e1, sub e2)
@@ -356,9 +354,7 @@ module Translate = struct
         begin match e.elt  with
           | Ast.Const(x,_) -> Const(x,t)
           | Ast.Id x -> Var (lookup_ctx g x)
-          | Ast.Abort | Ast.Fst | Ast.Snd -> error e.loc "INTERNAL: This term must be applied"
-          | Ast.Inl e -> Inl(t, translate_tm g e)
-          | Ast.Inr e -> Inr(t, translate_tm g e)
+          | Ast.Abort | Ast.Inl | Ast.Inr | Ast.Fst | Ast.Snd -> error e.loc "INTERNAL: This term must be applied"
           | Ast.Case(e1, x, e2, y, e3) ->
             begin match e1.dec with
               | None -> error e.loc "trying to translate undecorated node"
@@ -400,6 +396,8 @@ module Translate = struct
             let te2 = translate_tm g e2 in
             begin match e1.elt with
               | Abort -> Err(t, te2)
+              | Inl -> Inl(t, te2)
+              | Inr -> Inr(t, te2)
               | Fst ->
                 begin match e2.dec with
                   | Some (Prod(t, u)) -> Fst(Prod(translate_ty t, translate_ty u), te2)

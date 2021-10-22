@@ -102,13 +102,13 @@ exp1:
 
   | UNIT                                                { (loc $startpos $endpos @@ Unit) }
 
-  | INL LPAREN e=exp RPAREN                             { (loc $startpos $endpos @@ Inl e) }
+  | INL                                                 { (loc $startpos $endpos @@ Inl) }
 
-  | INR LPAREN e=exp RPAREN                             { (loc $startpos $endpos @@ Inr e) }
+  | INR                                                 { (loc $startpos $endpos @@ Inr) }
 
   | BEGIN MATCH e1=exp WITH
-    BAR INL LPAREN x=LIDENT RPAREN ARROW e2 = exp
-    BAR INR LPAREN y=LIDENT RPAREN ARROW e3 = exp
+    BAR INL x=LIDENT ARROW e2 = exp
+    BAR INR y=LIDENT ARROW e3 = exp
     END                                                 { (loc $startpos $endpos @@ Case (e1, x, e2, y, e3)) }
 
 

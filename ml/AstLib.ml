@@ -95,17 +95,17 @@ and print_exp_aux level fmt e =
 
   | Abort -> pps "abort"
         
-  | Inl e -> pps "inl("; print_exp_aux 0 fmt e; pps ")"
+  | Inl   -> pps "inl"
 
-  | Inr e -> pps "inr("; print_exp_aux 0 fmt e; pps ")"
+  | Inr   -> pps "inr"
 
   | Case(e1, x, ex, y, ey) ->
      pp_open_box fmt 0;
      pps "begin match "; print_exp_aux 0 fmt e1; pps " with"; ppnl ();
-     pps "  | inl("; print_id_aux fmt x; pps ") -> ";
+     pps "  | inl "; print_id_aux fmt x; pps " -> ";
      pp_open_box fmt 4; print_exp_aux 0 fmt ex;
      pp_close_box fmt (); ppnl ();
-     pps "  | inr("; print_id_aux fmt y; pps ") -> ";
+     pps "  | inr "; print_id_aux fmt y; pps " -> ";
      pp_open_box fmt 4; print_exp_aux 0 fmt ey;
      pp_close_box fmt (); ppnl ();
      pps "end";
@@ -120,10 +120,12 @@ and print_exp_aux level fmt e =
   | Snd -> pps "snd"
 
   | Let((x, t), e1, e2) ->
-     pp_open_box fmt 0;
+     pp_open_hbox fmt ();
      pps "let "; print_id_aux fmt x; pps " : "; print_ty_aux 0 fmt t; pps " ="; ppsp ();
-     pp_open_box fmt 2; print_exp_aux 0 fmt e1;
-     pp_close_box fmt (); ppsp (); pps "in"; ppnl ();
+     print_exp_aux 0 fmt e1;
+     ppsp (); pps "in";
+     pp_close_box fmt ();
+     ppnl ();
      print_exp_aux 0 fmt e2;
      pp_close_box fmt ()
 
@@ -136,8 +138,10 @@ and print_exp_aux level fmt e =
      pp_close_box fmt ()
 
   | App(e1, e2) ->
-     print_exp_aux this_level fmt e1; ppsp (); print_exp_aux 100 fmt e2
-
+    pp_open_hbox fmt ();
+    print_exp_aux this_level fmt e1; ppsp (); print_exp_aux 100 fmt e2;
+    pp_close_box fmt ()
+      
   end; if this_level < level then pps ")"
 
 and print_bnd_aux fmt (id, t) =
