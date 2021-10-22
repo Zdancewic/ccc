@@ -33,6 +33,33 @@ level of the repo.
 
 ## OCaml Implementation
 
-To build the OCaml development, run `make` from the `ml` subdirectory.  You can
-also run `make utop` to get 
+To build the OCaml development, run `make` from the `ml` subdirectory. This
+generates `Main.native`, a simple front-end that accepts files with STLC terms
+and prints out their denotations.  Run it by calling `Main.native <foo>.stlc`
+where `<foo>` is a filename and `stlc` is the file extension.  The
+(undocumented) syntax for STLC programs is almost OCaml, except that all types
+are capitalized, all `let` expressions and `fun` binders must have type
+annotations.  See the files in `test/test*.stlc` for some examples.
+
+Here is a sample output (which takes a long time to compute for such a small program!):
+```
+~/Research/ccc/ml> ./Main.native test/test_pair0.stlc
+---------------------------------------------------------------- test_pair0.stlc
+type Bool = One + One
+
+
+let true : Bool = inl(())
+in
+let false : Bool = inr(())
+in
+let f : Bool * Bool -> Bool = fun (x : Bool * Bool) -> fst x in
+f (false, true)
+
+---------------------------------------------------
+DENOTATION: 
+0 -> Inr 0
+```
+
+
+You can also run `make utop` to get a `utop` environment to play around with things interactively.
 
