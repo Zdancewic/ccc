@@ -110,7 +110,10 @@ module
         | Map m ->
           pps "["; pp_open_hovbox f 0;
           (pp_print_list ~pp_sep:(fun f () -> pp_print_string f ","; pp_print_space f ())
-            (fun f (k,v) -> pp f k; pp_print_string f " -> "; pp f v)
+             (fun f (k,v) ->
+                pp f k;
+                pp_print_space f (); pp_print_string f "->"; pp_print_space f ();
+                pp f v)
             f
             (AtomMap.bindings m));
           pp_close_box f ();          
