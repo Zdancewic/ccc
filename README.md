@@ -38,7 +38,7 @@ generates `Main.native`, a simple front-end that accepts files with STLC terms
 and prints out their denotations.  Run it by calling `Main.native <foo>.stlc`
 where `<foo>` is a filename and `stlc` is the file extension.  The
 (undocumented) syntax for STLC programs is almost OCaml, except that all types
-are capitalized, all `let` expressions and `fun` binders must have type
+are capitalized, and all `let` expressions and `fun` binders must have type
 annotations.  See the files in `test/test*.stlc` for some examples.
 
 Here is a sample output (which takes a long time to compute for such a small program!):
@@ -48,10 +48,8 @@ Here is a sample output (which takes a long time to compute for such a small pro
 type Bool = One + One
 
 
-let true : Bool = inl(())
-in
-let false : Bool = inr(())
-in
+let true : Bool = inl () in
+let false : Bool = inr () in
 let f : Bool * Bool -> Bool = fun (x : Bool * Bool) -> fst x in
 f (false, true)
 
