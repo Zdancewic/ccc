@@ -46,16 +46,16 @@ module Denote (C : CCC) = struct
   let rec denote_typ (t:typ) : obj =
     begin match t with
     | Base n     -> b n
-    | Zero       -> z  
+    | Zero       -> zero
     | Plus(t, u) -> sum (denote_typ t) (denote_typ u)
-    | One        -> u
+    | One        -> one
     | Prod(t, u) -> prod (denote_typ t) (denote_typ u)
     | Arr(t, u)  -> exp (denote_typ t) (denote_typ u)
     end
 
   let rec denote_ctx (g:ctx) : obj =
     begin match g with
-    | [] -> u
+    | [] -> one
     | t::g' -> prod (denote_typ t) (denote_ctx g')
     end
 
@@ -81,7 +81,7 @@ module Denote (C : CCC) = struct
           denote_var g v
 
         | Err(t, e) ->
-          (denote g e) >>> (zero (denote_typ t))
+          (denote g e) >>> (abort (denote_typ t))
 
         | Inl(Plus(t, u), e) ->
           (denote g e) >>> (inl (denote_typ t) (denote_typ u))

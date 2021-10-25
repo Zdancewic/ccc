@@ -378,8 +378,8 @@ Section CartesianClosed.
   (*
     Cartesian closure:  
       We can build a graph that represents DGPH A B
-        vertices are graph morphisms from graph A to graph B
-           given f, g : graph_morphism A B
+        vertices are functions from vertices of A to vertices of B
+           given f, g : Fun A ==> B
       each edge from f to g is given by 
       h : graph_morphism (I ⊗ A) B
         s.t. h (ss_I, a) = f a

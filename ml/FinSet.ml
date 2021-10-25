@@ -36,11 +36,11 @@ module FinSet : CCC = struct
     loop x AtomSet.empty
 
   (* one is the same as the singleton set {0} *)
-  let u = b 1
+  let one = b 1
 
-  let z = b 0
+  let zero = b 0
   
-  let zero _ = AtomMap.empty
+  let abort _ = AtomMap.empty
 
   (* the disjoint union of two sets *)
   let sum a b =

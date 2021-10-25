@@ -29,14 +29,14 @@ module type CCC = sig
   val b : int -> obj
 
   (* These provide ways of constructing objects in the category *)
-  val u : obj
-  val z : obj
+  val one : obj
+  val zero : obj
   val prod : obj -> obj -> obj
   val sum  : obj -> obj -> obj
   val exp  : obj -> obj -> obj
 
   (* zero A : 0 ==> A *)
-  val zero : obj -> hom
+  val abort : obj -> hom
 
   (* inl A B : A ==> A + B *)
   val inl  : obj -> obj -> hom
@@ -59,13 +59,20 @@ module type CCC = sig
   (* snd A B : A * B ==> B *)
   val snd  : obj -> obj -> hom
 
-
   (* f : C ==> A
      g : C ==> B
      pair f g : C ==> A * B
    *)
   val pair : hom -> hom -> hom
 
+  (* f : A ==> C
+     g : B ==> D
+     bimmap_prod A B : A * B ==> C * D
+     ===
+     pair (fst A B >>> f) (snd A B >>> g)
+  *)
+  (* val bimap_prod : obj -> obj -> hom -> hom -> hom *)
+      
   (* f : A * B ==> C 
      curry f : A ==> [B -> C]
    *)
@@ -90,8 +97,8 @@ module OCaml : CCC =
       | Fun : ('a -> 'b) -> hom
 
     let b x = ()
-    let u = ()
-    let z = ()
+    let one = ()
+    let zero = ()
     let prod x y = ()
     let sum x y = ()
     let exp x y = ()
@@ -107,7 +114,7 @@ module OCaml : CCC =
 
     let (>>>) (Fun f) (Fun g) = Fun (fun x -> g (Obj.magic (f x)))
     
-    let zero _ = Fun (fun (z:void) -> begin match z with | _ -> . end)
+    let abort _ = Fun (fun (z:void) -> begin match z with | _ -> . end)
 
     let inl _ _  = Fun (fun x -> Inl x)
     let inr _ _ = Fun (fun y -> Inr y)
@@ -119,6 +126,8 @@ module OCaml : CCC =
     let snd _ _ = Fun snd
     let pair (Fun f) (Fun g) = Fun (fun c -> (f c, (Obj.magic g c)))
 
+    let bimap_prod (Fun f) (Fun g) = Fun (fun (x,y) -> (f x, g y))
+        
     let curry (Fun f) = Fun (fun x y -> (Obj.magic f (x, y)))
     let apply _ _ = Fun (fun (f, x) -> f x)
 
