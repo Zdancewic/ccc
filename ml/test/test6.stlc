@@ -1,0 +1,5 @@
+type Bool = One + One
+
+fun (x:Bool) -> x
+
+

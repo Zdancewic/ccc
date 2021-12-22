@@ -5,6 +5,10 @@
 module Denote (C : CCC) = struct
   open C
 
+  (*  G |- e : t *)
+
+  (* [[e]] : [[G]]  ==> [[t]] *)
+      
   (* swap : A * B ==>  B * A *)
 
 
@@ -53,6 +57,7 @@ module Denote (C : CCC) = struct
     | Arr(t, u)  -> exp (denote_typ t) (denote_typ u)
     end
 
+  (* [[G]] *)
   let rec denote_ctx (g:ctx) : obj =
     begin match g with
     | [] -> one
@@ -60,6 +65,10 @@ module Denote (C : CCC) = struct
     end
 
   (*
+       (x, t) \in G
+       ------------ 
+        G |- x : t      [[x]] : [[G]] ==> [[t]]
+
        denote_var g v :  denote_ctx g ==> denote_typ (lookup_cxt g v)
    *)
   let rec denote_var (g:ctx) (v:var) : hom =
@@ -89,6 +98,18 @@ module Denote (C : CCC) = struct
         | Inr(Plus(t, u), e) ->
           (denote g e) >>> (inr (denote_typ t) (denote_typ u))
 
+        (*
+           G |- e : t + u
+           (x:t),G |- lft : r
+           (y:t),G |- rgt : r
+           -------------------
+           match e with inl x -> lft | inr y -> rgt end : r
+
+
+        [[-]] :  [[G]] ==> [[r]]
+        *)
+
+        
         | Case(Plus(t, u), r, e, lft, rgt)  ->
           let dg = denote_ctx g in 
           (pair

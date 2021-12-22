@@ -15,8 +15,11 @@ Parser.ml:
 %.byte: $(FILES)
 	ocamlbuild -libs $(LIBS) $@ $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
 
+output/%.pdf: output/%.gv
+	sfdp -Tpdf $? -o $@
 
-utop: Top.byte
+
+utop: Main.byte Top.byte
 	utop
 
 .PHONY: clean

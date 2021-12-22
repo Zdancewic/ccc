@@ -2,7 +2,7 @@
 (* Types *)
 type typ =
   | Base of int
-  | Zero
+  | Zero   (* void *)
   | Plus of typ * typ
   | One
   | Prod of typ * typ
@@ -19,7 +19,7 @@ type var =
 type lit = int * typ
 
 type tm =
-  | Const of lit    (* Const(i,t) : t *)
+  | Const of lit          (* Const(i,t) : t *)
   | Var of var
   | Err of typ * tm       (* Abort *)
   | Inl of typ * tm

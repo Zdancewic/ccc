@@ -60,9 +60,9 @@ let process_lc_ast path file lc_ast =
   let tc = Typecheck.Infer.elaborate_ctx tydefs in
   let tm = Typecheck.Infer.elaborate_tm tc e in
   let stlc_tm = Typecheck.Translate.translate_tm [] tm in
-  let d = Top.D.denote_tm (fun _ -> failwith "const") [] stlc_tm in
+  let d = Top.DSet.denote_tm (fun _ -> failwith "const") [] stlc_tm in
   Printf.printf "DENOTATION: \n%s\n%!"
-    (Top.D.string_of_denotation d)
+    (Top.DSet.string_of_denotation d)
     
 
   

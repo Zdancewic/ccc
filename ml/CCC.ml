@@ -35,7 +35,7 @@ module type CCC = sig
   val sum  : obj -> obj -> obj
   val exp  : obj -> obj -> obj
 
-  (* zero A : 0 ==> A *)
+  (* abort A : 0 ==> A *)
   val abort : obj -> hom
 
   (* inl A B : A ==> A + B *)

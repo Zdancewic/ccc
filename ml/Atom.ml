@@ -1,5 +1,3 @@
-;; open StringLib
-
 
 let pretty = ref false 
     
@@ -98,11 +96,11 @@ module
         | Inl x ->
           if !pretty && x = (Base 0)
           then pps "T"
-          else (pps "Inl"; ps (); pp f x)
+          else (pps "Inl "; pp f x)
         | Inr x ->
           if !pretty && x = (Base 0)
           then pps "F"
-          else (pps "Inr"; ps (); pp f x)
+          else (pps "Inr "; pp f x)
         | Prod(x,y) ->
           pp_open_hbox f ();
           pps "("; pp f x; pps ","; ps (); pp f y; pps ")";

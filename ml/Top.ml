@@ -7,6 +7,14 @@
 ;; open Ast
 ;; open AstLib
 
-module D = Denote(FinSet)
+;; open DiGraph    
+    
+module DSet = Denote(FinSet)
 
-;; D.denote_tm (fun _ -> failwith "const") [] STLC.ex4
+;; DSet.denote_tm (fun _ -> failwith "const") [] STLC.ex4
+
+
+module DGraph = Denote(DiGraph)
+
+(* ;; DGraph.denote_tm (fun _ -> failwith "const") [] STLC.ex4 *)
+  

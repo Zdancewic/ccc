@@ -406,53 +406,6 @@ Module STLC (BT: Base).
     apply steps_val. apply step_val.
   Qed.
   
-  Program Fixpoint candidate (t:typ) : tm [] t -> Prop :=
-    match t with
-    | Arr t1 t2 => fun (e : tm [] (Arr t1 t2)) =>  forall (v : val t1), candidate t2 (App _ _ _ e (tm_of_val t1 v)) 
-    | Zero => fun (e : tm [] Zero) => False
-    | _ => fun (e : tm [] _) => exists v, steps _ e v
-    end.
-  Next Obligation.
-    split. intro. inversion H0. repeat intro. inversion H0.
-  Qed.
-  Next Obligation.
-    split. intro. inversion H1. repeat intro. inversion H1.
-  Qed.
-  Next Obligation.
-    split. intro. inversion H. repeat intro. inversion H.
-  Qed.
-  Next Obligation.
-    split. intro. inversion H1. repeat intro. inversion H1.
-  Qed.
-
-  (*
-  Lemma identity_extentions : forall (t:typ) (e : tm [] t), candidate t e. 
-    induction t.
-    - intros. cbn. 
-   *)
-  (*   - intros. cbn.  *)
-  
-  
-  
-  (* Lemma strong_normalization : forall t (e : tm [] t), exists v, steps t e v. *)
-  (* Proof. *)
-  (*   induction t. *)
-  
-  Inductive uninhabited : typ -> Prop :=
-  | U_Zero : uninhabited Zero
-  | U_Plus : forall t1 t2, uninhabited t1 -> uninhabited t2 -> uninhabited (Plus t1 t2)
-  | U_Prod1 : forall t1 t2, uninhabited t1 -> uninhabited (Prod t1 t2)
-  | U_Prod2 : forall t1 t2, uninhabited t2 -> uninhabited (Prod t1 t2)
-  | U_Arr : forall t1 t2, uninhabited t2 -> uninhabited (Arr t1 t2)
-  .
-
-  (* Lemma no_closed_uninhabited : forall t (HU: uninhabited t) (e : tm [] t), False. *)
-  (* Proof. *)
-  (*   intros t HU e. *)
-  (*   remember [] as G. *)
-  (*   revert HeqG *)
-  
-                                                  
 End STLC.
 
 Module BNone : Base.
