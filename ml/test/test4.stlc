@@ -1,3 +1,0 @@
-type Bool = One + One
-
-fun (x:Bool) (y:Bool) -> x	

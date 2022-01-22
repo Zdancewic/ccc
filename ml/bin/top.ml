@@ -1,3 +1,5 @@
+;; open Syntax
+;; open Semantics    
 ;; open FinSet
 ;; open STLC
 ;; open Typecheck

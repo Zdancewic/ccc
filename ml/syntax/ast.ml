@@ -1,3 +1,4 @@
+;; open Util
 
 type ('d, 'a) node = { elt : 'a; loc : Range.t; dec : 'd option}
 

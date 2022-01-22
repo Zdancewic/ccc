@@ -1,4 +1,4 @@
-;; open STLC
+;; open Syntax.STLC
 ;; open CCC
 
 

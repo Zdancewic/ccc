@@ -4,7 +4,7 @@
 
 open Format
 open Ast
-open Range
+open Util.Range
 
 (* Precedence for expressions and operators *)
 (* Higher precedences bind more tightly     *)

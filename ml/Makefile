@@ -1,27 +1,17 @@
-LIBS = unix,str,nums
-BUILDFLAGS = -use-menhir -yaccflag --explain -tag debug
-OCAMLFLAGS = -g
+.PHONY: clean ccc
 
-FILES = $(wildcard *.ml) Parser.mly Lexer.mll
+all: ccc
 
-all: Main.native
+ccc: 
+	dune build
+	@cp bin/main.exe ccc
 
-Parser.ml:
-	ocamlbuild -libs $(LIBS) Parser.ml $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
+test: ccc
+	./ccc --test
 
-%.native: $(FILES)
-	ocamlbuild -libs $(LIBS) $@ $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
-
-%.byte: $(FILES)
-	ocamlbuild -libs $(LIBS) $@ $(BUILDFLAGS) -cflags $(OCAMLFLAGS)
-
-output/%.pdf: output/%.gv
-	sfdp -Tpdf $? -o $@
-
-
-utop: Main.byte Top.byte
+utop:
 	utop
 
-.PHONY: clean
 clean:
-	ocamlbuild -clean
+	dune clean
+	rm -rf ccc

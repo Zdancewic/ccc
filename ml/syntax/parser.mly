@@ -1,4 +1,5 @@
 %{
+open Util
 open Ast
 
 let loc (startpos:Lexing.position) (endpos:Lexing.position) (elt:'a) : ('d, 'a) node =

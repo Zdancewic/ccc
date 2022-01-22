@@ -1,3 +1,4 @@
+open Syntax
 open Printf
 
 (* files processed during this run of the compiler *)

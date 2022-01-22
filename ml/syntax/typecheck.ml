@@ -2,7 +2,7 @@
 ;; open STLC
 
 let error loc s =
-  failwith @@ Printf.sprintf "ERROR: %s - %s" (Range.string_of_range loc) s
+  failwith @@ Printf.sprintf "ERROR: %s - %s" (Util.Range.string_of_range loc) s
 
 module Unify = struct
 

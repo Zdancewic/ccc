@@ -1,7 +1,0 @@
-type Bool = One + One
-
-fun (x:Bool) ->
-  begin match x with                  
-  | inl y -> inr y
-  | inr z -> inl z
-  end

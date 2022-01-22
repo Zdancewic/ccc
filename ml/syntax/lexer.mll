@@ -1,4 +1,5 @@
 {
+  open Util
   open Lexing
   open Parser
   open Range

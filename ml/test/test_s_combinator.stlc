@@ -1,3 +1,0 @@
-type Bool = One + One
-
-fun  (x : Bool -> Bool -> Bool) (y : Bool -> Bool) (z : Bool) -> (x z) (y z)
