@@ -1,0 +1,3 @@
+(library
+ (name semantics)
+ (libraries syntax util))

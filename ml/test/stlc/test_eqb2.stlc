@@ -1,0 +1,15 @@
+type Bool = One + One
+
+fun (x:Bool) (y:Bool) ->
+  begin match x with
+  | inl x1 ->
+    begin match y with
+    | inl y1 -> inl ()
+    | inr y1 -> inr ()
+    end
+  | inr x2 ->
+    begin match y with
+    | inl y1 -> inr ()
+    | inr y1 -> inl ()
+    end
+ end

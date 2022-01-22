@@ -1,0 +1,5 @@
+(executable
+ (public_name ccc)
+ (name main)
+ (promote (until-clean))	
+ (libraries syntax semantics unix str num))

@@ -1,0 +1,1 @@
+z:One |- fun (x : One -> One -> One) (y : One) -> x y z
